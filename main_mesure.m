@@ -37,35 +37,16 @@ for ii = 1:nbOutput
 end
 %burst(str2double(nbOutput)+1,:) = 0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
 
-N_buffers = ceil(size(burst,2)/buffer)+1;
-
-signal = zeros(N_buffers * buffer, size(burst,1));
-signal(1:size(burst,2), :) = burst';
-
-audioFromDevice = zeros(size(signal,1),nbInput);
-
 %% Boucle de mesure
-for k = 1:N_buffers
-    % Boucle de mesure
-    
-    [audioFromDevice((k-1)*buffer+1:k*buffer,:),numUnderrun(k),numOverrun(k)] = aPR(signal((k-1)*buffer+1:k*buffer,:));
-    
-end
 
-%% Correction des signaux pour enlever la latence
-mesurement = zeros(size(signal,1)+lat_lag,nbInput);
-mesurement(size(signal,1),:) = circshift(audioFromDevice,-lat_lag);
+mesurement = makeMesurement(aPR,nbInput,lat_lag,burst);
 
 %% Affichage
 figure
 plot(signal)
 hold on
-plot(audioFromDevice)
+plot(mesurement)
 legend('Output','Input')
-figure
-plot(numUnderrun)
-hold on
-plot(numOverrun)
 
 %% Fermeture de la carte son
 % release(handle_audio_player)
