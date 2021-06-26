@@ -32,6 +32,7 @@ t  = (0:1/sampleRate:T-1/sampleRate)';  % time axis
 
 % burst signal
 t_burst = T/100;
+burst = zeros(nbOutput,length(t));
 for ii = 1:nbOutput
     burst(ii,:) = 0.8*randn(1,length(t));%0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
 end

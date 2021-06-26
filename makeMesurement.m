@@ -1,3 +1,18 @@
+%% makeMesurement.m
+% Fonction de mesure par carte son
+% --- ENTREE ---
+% aPR (obj) : obj audioPlayerRecorder MATLAB
+% nbInput (int) : nombre d'entrée initialisées
+% lat_lag (int) : latence de la carte son en échantillons
+% in (mat) : signal à émettre, une colonne par sortie
+% --- SORTIE ---
+% out (mat) : matrice contenant les signaux enregistrés, une colonne par
+% entrée, la longueur des signaux est un multiple du buffer de la carte son
+% --- CREDIT ---
+% v1.0 26/06/2021
+% GUIPAG
+% GPL-3.0 License
+
 function out = makeMesurement(aPR,nbInput,lat_lag,in)
 
 buffer = aPR.BufferSize;

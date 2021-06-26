@@ -1,3 +1,17 @@
+%% mesureLatency.m
+% Fonction de mesure par carte son
+% --- ENTREE ---
+% aPR (obj) : obj audioPlayerRecorder MATLAB
+% in (int) : entrée loopback
+% out (int) : sortie loopback
+% --- SORTIE ---
+% lat_s (double) : latence en seconde
+% lat_lag (int) : latence en échantillon
+% --- CREDIT ---
+% v1.0 26/06/2021
+% GUIPAG
+% GPL-3.0 License
+
 function [lat_s,lat_lag] = mesureLatency(aPR, in, out)
 
 T  = 1;                 % time of the burst

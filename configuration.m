@@ -1,3 +1,25 @@
+%% configuration.m
+% Fonction de configuration de la carte son
+% GUI
+% --- ENTREE ---
+% - none -
+% --- SORTIE ---
+% aPR (obj) : obj audioPlayerRecorder MATLAB
+% sampleRate (int) : Fréquence d'échantillonnage 
+% buffer (int) : Buffer
+% nbInput (int) : nombre d'entrée initialisées
+% nbOutput (int) : nombre de sorties initialisées
+% device (str) : nom de la carte son 
+% trigger (int) : sortie utilisée pour le trigger
+% lbIn (int) : entrée loopback pour calculer la latence
+% lbOut (int) : sortie loopback pour calculer la latence
+% --- FICHIER ---
+% properties.mat : fichier de sauvegarde de la configuration
+% --- CREDIT ---
+% v1.0 26/06/2021
+% GUIPAG
+% GPL-3.0 License
+
 function [aPR, sampleRate,buffer,nbInput,nbOutput,device,trigger,lbIn,lbOut] = configuration()
 
 choixConf = questdlg('Reprendre la même configuration ?', ...
