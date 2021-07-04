@@ -69,8 +69,8 @@ aPR = audioPlayerRecorder('Device',device,...
     'BufferSize',buffer);
 
 aPR.BitDepth = '32-bit float';
-aPR.RecorderChannelMapping = 1:nbInput;
-aPR.PlayerChannelMapping   = 1:nbOutput;
+aPR.RecorderChannelMapping = [1:nbInput lbIn];
+aPR.PlayerChannelMapping   = [1:nbOutput trigger lbOut];
 
 choixMesure = questdlg('Lancer la fenêtre de configuration ASIO ?', ...
 	'ASIO', ...

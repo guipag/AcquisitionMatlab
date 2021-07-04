@@ -8,10 +8,45 @@ clear all
 
 %% Configuration
 
-[aPR,sampleRate,buffer,nbInput,nbOutput,device,trigger,lbIn,lbOut] = configuration();
+% app = configGUI();
+% waitfor(app,'validation',true);
+% 
+% nbInput = app.NombreentresSpinner.Value;
+% nbOutput = app.NombresortiesSpinner.Value;
+% device = app.CartesonDropDown.Value;
+% sampleRate = str2double(app.FeDropDown.Value);
+% buffer = str2double(app.BufferDropDown.Value);
+% 
+% if app.ActivertriggerCheckBox.Value
+%     trigger = app.VoietriggerSpinner.Value;
+% end
+% if app.CompenserlatenceCheckBox.Value
+%     lbIn = app.LoopbackinSpinner.Value;
+%     lbOut = app.LoopbackoutSpinner.Value;
+% end
+% 
+% aPR = audioPlayerRecorder('Device',device,...
+%     'SampleRate',sampleRate,...
+%     'BufferSize',buffer);
+% 
+% aPR.BitDepth = '32-bit float';
+% aPR.RecorderChannelMapping = 1:nbInput;
+% aPR.PlayerChannelMapping = 1:nbOutput;
+% 
+% if app.CompenserlatenceChaeckBox
+%     aPR.RecorderChannelMapping(end+1) = lbIn;
+%     aPR.PlayerChannelMapping(end+1) = lbOut;
+% end
+% if app.ActivertriggerCheckBox.Value
+%     aPR.PlayerChannelMapping(end+1)   = trigger;
+% end
 
-%% Mesure de la latence en s et lag
-[lat_s,lat_lag] = mesureLatency(aPR,lbIn,lbOut);
+
+%% Mapping SC par objet
+
+SC = SoundCard();
+SC = SC.configure();
+SC = SC.compenseLatency();
 
 %% Confirmation du lancement de la mesure 
 % prompt "Lancer la mesure"
@@ -25,22 +60,20 @@ end
 
 %% Génération des signaux
 
-% synchronize on burst signal
 T  = 1;                 % time of the burst
 f0 = 1e3;               % burst main frequency
-t  = (0:1/sampleRate:T-1/sampleRate)';  % time axis
+t  = (0:1/SC.sampleRate:T-1/SC.sampleRate)';  % time axis
 
 % burst signal
 t_burst = T/100;
-burst = zeros(nbOutput,length(t));
-for ii = 1:nbOutput
-    burst(ii,:) = 0.8*randn(1,length(t));%0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
+burst = zeros(SC.nbOutput,length(t));
+for ii = 1:SC.nbOutput
+    burst(ii,:) = randn(length(t),1);%0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
 end
-%burst(str2double(nbOutput)+1,:) = 0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
 
-%% Boucle de mesure
+%% Mesure
 
-mesurement = makeMesurement(aPR,nbInput,lat_lag,burst);
+mesurement = SC.mesure(burst);
 
 %% Affichage
 figure

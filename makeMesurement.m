@@ -13,16 +13,29 @@
 % GUIPAG
 % GPL-3.0 License
 
-function out = makeMesurement(aPR,nbInput,lat_lag,in)
+function [out,numUnderrun,numOverrun] = makeMesurement(aPR,nbInput,lat_lag,in)
 
 buffer = aPR.BufferSize;
-
 N_buffers = ceil(size(in,2)/buffer)+1;
 
-signal = zeros(N_buffers * buffer, size(in,1));
-signal(1:size(in,2), :) = in';
+%% création du trigger
+t_trig = 0.01; %s
+n_trig = t_trig*aPR.SampleRate;
+%N_buffers_trig = ceil(n_trig/buffer)+1;
+trig = zeros(N_buffers * buffer+buffer,1);
+trig(buffer:n_trig+1) = 1; % signal créneau
 
-audioFromDevice = zeros(size(signal,1),nbInput);
+%% création du signal de sortie
+signal = zeros(N_buffers * buffer+buffer, size(in,1)+2); % on ajoute 1 buffer supplémentaire, la sortie trigger et la compensation latence
+signal(1:size(in,2), 1:size(in,1)) = in';
+signal = circshift(signal,buffer); % zero-padding au départ
+
+signal(:,end-1) = trig;
+
+%% initialisation des variables I/O
+audioFromDevice = zeros(size(signal,1),nbInput+1);
+numUnderrun = zeros(N_buffers,1);
+numOverrun = zeros(N_buffers,1);
 
 %% Boucle de mesure
 for k = 1:N_buffers
@@ -30,7 +43,7 @@ for k = 1:N_buffers
 end
 
 %% Correction des signaux pour enlever la latence
-out = zeros(size(signal,1)+lat_lag,nbInput);
-out(size(signal,1),:) = circshift(audioFromDevice,-lat_lag);
+%out = zeros(size(signal,1)+lat_lag,nbInput);
+out = circshift(audioFromDevice,-lat_lag); %compensation de la latence
 
 end
