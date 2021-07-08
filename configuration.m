@@ -20,7 +20,7 @@
 % GUIPAG
 % GPL-3.0 License
 
-function [aPR, sampleRate,buffer,nbInput,nbOutput,device,trigger,lbIn,lbOut] = configuration()
+function [aPR, sampleRate,buffer,nbInput,nbOutput,device,trigger,lbIn,lbOut] = configuration(sampleRate,buffer,nbInput,nbOutput,trigger,lbIn,lbOut)
 
 choixConf = questdlg('Reprendre la même configuration ?', ...
     'Configuration', ...
@@ -40,15 +40,16 @@ switch choixConf
         prompt = {'Fréquence d échantillonnage :','Buffer :','Nb input :','Nb output :','Trigger','Loopback out :','Loopback in :'};
         dlgtitle = 'Paramètres';
         dims = [1 35];
-        definput = {'48000','128','1','1','24','193','193'};
+        definput = {num2str(sampleRate),num2str(buffer),num2str(nbInput),num2str(nbOutput),num2str(trigger),num2str(lbIn),num2str(lbOut)};
         answer = inputdlg(prompt,dlgtitle,dims,definput);
         
         sampleRate = str2double(answer{1});
         buffer = str2double(answer{2});
-        nbInput = str2double(answer{4});
-        nbOutput = str2double(answer{3});
+        nbInput = str2double(answer{3});
+        nbOutput = str2double(answer{4});
         device = lstSC{2};
         trigger = str2double(answer{5});
+        trigger_reset = 23;
         lbIn = str2double(answer{7});
         lbOut = str2double(answer{6});
         
@@ -58,6 +59,7 @@ switch choixConf
         prop.nbOutput = nbOutput;
         prop.device = lstSC{2};
         prop.trigger = trigger;
+        prop.trigger_reset = 23;
         prop.lbIn = lbIn;
         prop.lbOut = lbOut;
         
@@ -70,14 +72,6 @@ aPR = audioPlayerRecorder('Device',device,...
 
 aPR.BitDepth = '32-bit float';
 aPR.RecorderChannelMapping = [1:nbInput lbIn];
-aPR.PlayerChannelMapping   = [1:nbOutput trigger lbOut];
-
-choixMesure = questdlg('Lancer la fenêtre de configuration ASIO ?', ...
-	'ASIO', ...
-	'Oui','Non','Non');
-
-if choixMesure == "Oui"
-    asiosettings(device)
-end
+aPR.PlayerChannelMapping   = [1:nbOutput trigger_reset trigger lbOut];
 
 end

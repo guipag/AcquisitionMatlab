@@ -48,13 +48,11 @@ SC = SoundCard();
 SC = SC.configure();
 SC = SC.compenseLatency();
 
+SC.onlyTrigger();
+
 %% Confirmation du lancement de la mesure 
 % prompt "Lancer la mesure"
-choixMesure = questdlg('Lancer la mesure ?', ...
-	'Mesure', ...
-	'Oui','Non','Non');
-
-if choixMesure == "Non"
+if questdlg('Lancer la mesure ?','Mesure','Oui','Non','Non') == "Non"
     return
 end
 
@@ -68,7 +66,8 @@ t  = (0:1/SC.sampleRate:T-1/SC.sampleRate)';  % time axis
 t_burst = T/100;
 burst = zeros(SC.nbOutput,length(t));
 for ii = 1:SC.nbOutput
-    burst(ii,:) = randn(length(t),1);%0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
+    sig_temp = 0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));%0.5*mls(length(t));
+    burst(ii,:) = sig_temp(1:length(t));%0.5*real(exp(-(1000*(t-t_burst)).^2 + 1i*2*pi*f0*t));
 end
 
 %% Mesure

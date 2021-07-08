@@ -13,25 +13,33 @@
 % GUIPAG
 % GPL-3.0 License
 
-function [out,numUnderrun,numOverrun] = makeMesurement(aPR,nbInput,lat_lag,in)
+function [out,numUnderrun,numOverrun] = makeMesurement(aPR,nbInput,lat_lag,in,withTrig,reset)
+
+if nargin < 6
+    reset = false;
+end
 
 buffer = aPR.BufferSize;
 N_buffers = ceil(size(in,2)/buffer)+1;
 
 %% création du trigger
-t_trig = 0.01; %s
+t_trig = 0.1; %s
 n_trig = t_trig*aPR.SampleRate;
 %N_buffers_trig = ceil(n_trig/buffer)+1;
 trig = zeros(N_buffers * buffer+buffer,1);
 trig(buffer:n_trig+1) = 1; % signal créneau
 
 %% création du signal de sortie
-signal = zeros(N_buffers * buffer+buffer, size(in,1)+2); % on ajoute 1 buffer supplémentaire, la sortie trigger et la compensation latence
+signal = zeros(N_buffers * buffer+buffer, size(in,1)+3); % on ajoute 1 buffer supplémentaire, la sortie trigger et la compensation latence
 signal(1:size(in,2), 1:size(in,1)) = in';
 signal = circshift(signal,buffer); % zero-padding au départ
 
-signal(:,end-1) = trig;
-
+if withTrig
+    signal(:,end-1) = trig;
+end
+if reset
+    signal(:,end-2) = trig;
+end
 %% initialisation des variables I/O
 audioFromDevice = zeros(size(signal,1),nbInput+1);
 numUnderrun = zeros(N_buffers,1);
